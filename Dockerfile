@@ -30,9 +30,8 @@ ENV DATABASE_URL=$DATABASE_URL
 # Build the Next.js application
 RUN npm run build
 
-# Set environment variables for Puppeteer
+# Puppeteer in this image auto-detects Chrome, no path needed
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
 # Expose port
 EXPOSE 3000
