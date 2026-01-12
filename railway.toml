@@ -1,0 +1,6 @@
+[build]
+# Pass DATABASE_URL as a Docker build argument
+dockerfilePath = "Dockerfile"
+
+[build.args]
+DATABASE_URL = "${{DATABASE_URL}}"
