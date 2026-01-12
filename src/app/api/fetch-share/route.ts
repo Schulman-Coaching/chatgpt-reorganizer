@@ -1,8 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Message } from '@/lib/types';
 import puppeteer from 'puppeteer';
+import { existsSync } from 'fs';
 
 export const maxDuration = 60; // Allow up to 60 seconds for this route
+
+// Find Chrome executable - check common locations
+function findChrome(): string | undefined {
+  const paths = [
+    process.env.PUPPETEER_EXECUTABLE_PATH,
+    '/usr/bin/chromium-browser',
+    '/usr/bin/chromium',
+    '/usr/bin/google-chrome',
+    '/usr/bin/google-chrome-stable',
+  ].filter(Boolean) as string[];
+
+  for (const p of paths) {
+    if (existsSync(p)) return p;
+  }
+  return undefined; // Let Puppeteer use bundled browser
+}
 
 export async function POST(request: NextRequest) {
   let browser = null;
@@ -28,9 +45,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Launch Puppeteer
+    const chromePath = findChrome();
+    console.log('Using Chrome at:', chromePath || 'bundled');
+
     browser = await puppeteer.launch({
       headless: true,
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+      executablePath: chromePath,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
