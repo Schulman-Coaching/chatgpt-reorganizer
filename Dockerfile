@@ -1,0 +1,38 @@
+# Use Node with Puppeteer support
+FROM ghcr.io/puppeteer/puppeteer:24.0.0
+
+# Set working directory
+WORKDIR /app
+
+# Switch to root to install dependencies
+USER root
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy Prisma files and generate client
+COPY prisma ./prisma/
+COPY prisma.config.ts ./
+RUN npx prisma generate
+
+# Copy the rest of the application
+COPY . .
+
+# Build the Next.js application
+RUN npm run build
+
+# Set environment variables for Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+
+# Expose port
+EXPOSE 3000
+
+# Set the port for Railway
+ENV PORT=3000
+
+# Start the application
+CMD ["npm", "start"]
