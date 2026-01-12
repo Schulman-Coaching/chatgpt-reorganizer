@@ -1,6 +1,9 @@
 # Use Node with Puppeteer support
 FROM ghcr.io/puppeteer/puppeteer:24.0.0
 
+# Build argument for database URL (needed for Next.js build)
+ARG DATABASE_URL
+
 # Set working directory
 WORKDIR /app
 
@@ -20,6 +23,9 @@ RUN npx prisma generate
 
 # Copy the rest of the application
 COPY . .
+
+# Set DATABASE_URL for build
+ENV DATABASE_URL=$DATABASE_URL
 
 # Build the Next.js application
 RUN npm run build
